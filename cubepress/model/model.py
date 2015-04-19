@@ -1,3 +1,7 @@
+import logging
+
+log = logging.getLogger(__name__)
+
 
 class Attribute(object):
 
@@ -81,6 +85,10 @@ class Model(object):
             in_model = False
             for attribute in self.attributes:
                 if attribute.matches_field(field):
+                    if in_model:
+                        log.warning("Column %s is used multiple times, make "
+                                    "sure the types are identical.",
+                                    field['title'])
                     in_model = True
                     attribute.update_from_field(field)
 
