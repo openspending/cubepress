@@ -17,6 +17,10 @@ class Attribute(object):
         return self.spec.get('column')
 
     @property
+    def column(self):
+        return self.model.project.table.columns[self.column_name]
+
+    @property
     def key(self):
         return self.spec.get('key', False)
 
@@ -56,6 +60,11 @@ class Dimension(object):
         for name, spec in self.spec.get('attributes', {}).items():
             yield Attribute(self.model, name, spec)
 
+    def get_attribute(self, name):
+        for attribute in self.attribute:
+            if attribute.name == name:
+                return attribute
+
     @property
     def key(self):
         key_attr, attrs = None, list(self.attributes)
@@ -94,6 +103,29 @@ class Model(object):
     def dimensions(self):
         for name, spec in self.spec.get('dimensions', {}).items():
             yield Dimension(self, name, spec)
+
+    def get_dimension(self, name):
+        for dimension in self.dimensions:
+            if dimension.name == name:
+                return dimension
+
+    def get_qualified(self, path):
+        dim_name, attribute = path, None
+        parts = path.split('.', 1)
+        if len(parts) > 1:
+            dim_name, attribute = parts
+
+        dimension = self.get_dimension(dim_name)
+        if dimension is None:
+            raise ValueError('Dimension does not exist: %s' % path)
+
+        if attribute is None or not len(attribute):
+            attribute = dimension.key
+        else:
+            attribute = dimension.get_attribute(attribute)
+            if attribute is None:
+                raise ValueError('Attribute does not exist: %s' % path)
+        return attribute
 
     @property
     def attributes(self):

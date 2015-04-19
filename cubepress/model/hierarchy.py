@@ -1,7 +1,7 @@
 from six import string_types
 
 from cubepress.model.filter import Filter
-from cubepress.model.util import valid_name
+from cubepress.model.util import valid_name, resolve_column
 
 
 class Level(object):
@@ -19,9 +19,11 @@ class Level(object):
 
     def generate(self):
         print 'Generating %s in %s' % (self.path, self.hierarchy.name)
-        drilldowns = []
+        model = self.hierarchy.project.model
+        drilldowns = [resolve_column(model, self.path)]
         filters = []
         permutes = []
+        print [drilldowns, filters, permutes]
 
 
 class Hierarchy(object):
@@ -48,4 +50,4 @@ class Hierarchy(object):
             yield filter
 
         for spec in self.spec.get('filters', []):
-            yield Filter(spec)
+            yield Filter(self.project, spec)

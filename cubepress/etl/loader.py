@@ -43,6 +43,7 @@ def generate_table(project, table_name, fields):
     table.create(project.engine)
     log.info("Generated ad-hoc table %s with %d columns.",
              project.table_name, len(table.columns))
+    project._table = table
     return table
 
 

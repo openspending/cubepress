@@ -2,7 +2,8 @@
 
 class Filter(object):
 
-    def __init__(self, spec):
+    def __init__(self, project, spec):
+        self.project = project
         self.spec = spec
 
     @property

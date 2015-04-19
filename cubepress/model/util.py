@@ -1,4 +1,5 @@
 from normality import slugify
+from sqlalchemy.sql.expression import extract
 
 
 def valid_name(name):
@@ -8,5 +9,7 @@ def valid_name(name):
     return slug
 
 
-def path_to_column(model, path):
-    pass
+def resolve_column(model, path):
+    parts = path.rsplit(':', 1)
+    attribute = model.get_qualified(parts[0])
+    return attribute.column

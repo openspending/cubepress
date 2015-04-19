@@ -1,6 +1,8 @@
 import os
 import yaml
 
+from sqlalchemy import MetaData
+from sqlalchemy.schema import Table
 from sqlalchemy import create_engine
 
 from cubepress.model.model import Model
@@ -45,13 +47,15 @@ class Project(object):
     @property
     def table(self):
         if not hasattr(self, '_table'):
-            self._table = create_engine(self.config.get('database'))
+            meta = MetaData()
+            meta.bind = self.engine
+            self._table = Table(self.table_name, meta, autoload=True)
         return self._table
 
     @property
     def filters(self):
         for spec in self.spec.get('filters', []):
-            yield Filter(spec)
+            yield Filter(self, spec)
 
     @property
     def hierarchies(self):
