@@ -7,7 +7,7 @@ from sqlalchemy.sql.expression import select
 
 def valid_name(name):
     slug = slugify(name, sep='_')
-    if slug != name:
+    if slug != name or slug == 'row_count':
         raise ValueError('Invalid identifier: %s' % name)
     return slug
 

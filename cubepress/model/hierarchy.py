@@ -44,7 +44,8 @@ class Level(object):
             pfilters = list(filters)
             pfilters.extend([(p, perm_set[p]) for p in ps])
             aggregate = Aggregate(self.hierarchy.project, pfilters, drilldowns)
-            print aggregate.stats()
+            from pprint import pprint
+            pprint(aggregate.get())
 
 
 class Hierarchy(object):

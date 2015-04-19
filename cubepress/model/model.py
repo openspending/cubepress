@@ -116,9 +116,8 @@ class Model(object):
 
     def get_qualified(self, path):
         dim_name, attribute = path, None
-        parts = path.split('.', 1)
-        if len(parts) > 1:
-            dim_name, attribute = parts
+        if '.' in dim_name:
+            dim_name, attribute = path.split('.', 1)
 
         dimension = self.get_dimension(dim_name)
         if dimension is None:
