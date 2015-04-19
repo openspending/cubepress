@@ -1,7 +1,5 @@
 import os
 import logging
-# from decimal import Decimal
-# from datetime import datetime
 
 from normality import slugify
 from messytables import any_tableset, type_guess

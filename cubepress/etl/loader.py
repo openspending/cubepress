@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.schema import Table, Column
 from sqlalchemy.types import Unicode, Integer, Date, Float
 
-from extract import extract_file
+from cubepress.etl.extract import extract_file
 
 log = logging.getLogger(__name__)
 
