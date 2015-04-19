@@ -42,7 +42,7 @@ def load_project(project, chunk_size=500):
     for i, record in enumerate(extract_file(project.data_file)):
         table_name, fields, row = record
         if table is None:
-            project.infer_from_data(table_name, fields)
+            project.update_from_data(table_name, fields)
             table = generate_table(project)
 
         return

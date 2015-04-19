@@ -1,6 +1,6 @@
 import logging
 
-from cubepress.spec import Project
+from cubepress.model import Project
 from cubepress.etl import load_project
 
 log = logging.getLogger(__name__)
