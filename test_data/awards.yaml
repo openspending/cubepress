@@ -1,0 +1,8 @@
+config:
+    data: awards.csv
+model:
+    measures:
+        amount:
+            title: 'Total Contract Amount (USD)'
+
+
