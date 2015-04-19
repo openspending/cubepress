@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import MetaData
 from sqlalchemy.schema import Table, Column
 from sqlalchemy.types import Unicode, Integer, Date, Float
 
@@ -17,46 +17,44 @@ TYPES = {
 }
 
 
-def generate_table(engine, table_name, fields):
+def generate_table(project):
     meta = MetaData()
-    meta.bind = engine
+    meta.bind = project.engine
 
-    table = Table(table_name, meta)
+    table = Table(project.table_name, meta)
     id_col = Column('_id', Integer, primary_key=True)
     table.append_column(id_col)
 
-    for spec in fields:
-        type_cls = TYPES[spec['type']]
-        column = Column(spec['name'], type_cls, nullable=True)
-        table.append_column(column)
+    # for spec in fields:
+    #     type_cls = TYPES[spec['type']]
+    #     column = Column(spec['name'], type_cls, nullable=True)
+    #     table.append_column(column)
 
-    table.create(engine)
+    table.create(project.engine)
     log.info("Generated ad-hoc table %s with %d columns.",
-             table_name, len(table.columns))
+             project.table_name, len(table.columns))
     return table
 
 
-def load_file(file_name, engine=None, chunk_size=500):
-    if engine is None:
-        engine = create_engine('sqlite://')
-
+def load_project(project, chunk_size=500):
     table = None
     chunk = []
-    specs = None
-    for i, (table_name, fields, row) in enumerate(extract_file(file_name)):
+    for i, record in enumerate(extract_file(project.data_file)):
+        table_name, fields, row = record
         if table is None:
-            table = generate_table(engine, table_name, fields)
-            specs = fields
+            project.infer_from_data(table_name, fields)
+            table = generate_table(project)
+
+        return
         chunk.append(row)
         if len(chunk) % chunk_size == 0:
             log.info("Loaded %s rows...", i + 1)
             stmt = table.insert(chunk)
-            engine.execute(stmt)
+            project.engine.execute(stmt)
             chunk = []
 
     if len(chunk):
         stmt = table.insert(chunk)
-        engine.execute(stmt)
+        project.engine.execute(stmt)
 
     log.info("Total: %s rows.", i + 1)
-    return engine, table, specs

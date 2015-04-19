@@ -1,3 +1,3 @@
-from cubepress.etl.loader import load_file
+from cubepress.etl.loader import load_project
 
-__all__ = ['load_file']
+__all__ = ['load_project']
