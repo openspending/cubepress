@@ -32,12 +32,6 @@ class Project(object):
         return self.config.get('table')
 
     @property
-    def table_exists(self):
-        if self.table_name is None:
-            return False
-        return self.engine.has_table(self.table_name)
-
-    @property
     def engine(self):
         if not hasattr(self, '_engine'):
             if 'database' not in self.config:

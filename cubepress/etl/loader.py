@@ -24,6 +24,10 @@ def generate_table(project, table_name, fields):
     meta = MetaData()
     meta.bind = project.engine
 
+    if project.engine.has_table(project.table_name):
+        log.info('Data table already exists, not loading data.')
+        return False
+
     table = Table(project.table_name, meta)
     id_col = Column('_id', Integer, primary_key=True)
     table.append_column(id_col)
@@ -60,6 +64,8 @@ def load_project(project, chunk_size=500):
         table_name, fields, row = record
         if table is None:
             table = generate_table(project, table_name, fields)
+            if table is False:
+                return
             attributes = field_attributes(project, fields)
 
         chunk.append(convert_row(attributes, row, line))
