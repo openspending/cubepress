@@ -11,4 +11,8 @@ def process_spec(file_name, spec):
     project = Project(file_name, spec)
     load_project(project)
 
-    print unicode(project)
+    for hierarchy in project.hierarchies:
+        print hierarchy.name
+        for level in hierarchy.levels:
+            level.generate()
+    # print unicode(project)

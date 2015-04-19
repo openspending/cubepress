@@ -6,7 +6,8 @@ from cubepress.model.util import valid_name
 
 class Level(object):
 
-    def __init__(self, parent, spec):
+    def __init__(self, hierarchy, parent, spec):
+        self.hierarchy = hierarchy
         self.parent = parent
         if isinstance(spec, string_types):
             spec = {'path': spec}
@@ -15,6 +16,12 @@ class Level(object):
     @property
     def path(self):
         return self.spec.get('path')
+
+    def generate(self):
+        print 'Generating %s in %s' % (self.path, self.hierarchy.name)
+        drilldowns = []
+        filters = []
+        permutes = []
 
 
 class Hierarchy(object):
@@ -32,7 +39,7 @@ class Hierarchy(object):
 
         parent = None
         for spec in self.spec['levels']:
-            parent = Level(parent, spec)
+            parent = Level(self, parent, spec)
             yield parent
 
     @property

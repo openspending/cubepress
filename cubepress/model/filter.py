@@ -16,3 +16,7 @@ class Filter(object):
     @property
     def fixed(self):
         return 'value' not in self.spec
+
+    @property
+    def options(self):
+        return []
