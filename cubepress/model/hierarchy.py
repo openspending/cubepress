@@ -1,9 +1,9 @@
 from six import string_types
-from sqlalchemy import and_
 
-from cubepress.aggregation import distinct_keys
+
 from cubepress.model.filter import Filter
-from cubepress.model.util import valid_name, resolve_column
+from cubepress.model.aggregate import Aggregate
+from cubepress.model.util import valid_name, distinct_keys
 
 
 class Level(object):
@@ -27,37 +27,24 @@ class Level(object):
         return self.parent.parent_paths + [self.parent.path]
 
     def query_filters(self):
-        filters = and_()
-        for filter in self.hierarchy.filters:
-            if filter.fixed:
-                col = resolve_column(self.model, filter.path)
-                filters = filters.and_(col == filter.value)
-        return filters
+        return [(f.path, f.value) for f in self.hierarchy.filters if f.fixed]
 
     def query_permutations(self):
-        permutations = []
-        for filter in self.hierarchy.filters:
-            if not filter.fixed:
-                permutations.append(filter.path)
-
-        for parent_path in self.parent_paths:
-            permutations.append(parent_path)
-
-        return [resolve_column(self.model, p) for p in permutations]
+        ps = [f.path for f in self.hierarchy.filters if not f.fixed]
+        ps.extend(self.parent_paths)
+        return list(set(ps))
 
     def generate(self):
-        # print 'Generating %s in %s' % (self.path, self.hierarchy.name)
-        drilldowns = [resolve_column(self.model, self.path)]
+        drilldowns = [self.path]
         filters = self.query_filters()
-        permutations = self.query_permutations()
+        ps = self.query_permutations()
         for perm_set in distinct_keys(self.hierarchy.project,
-                                      keys=permutations,
+                                      paths=ps,
                                       filters=filters):
-            pfilters = filters
-            for perm in permutations:
-                pfilters = and_(pfilters, perm == perm_set[perm.name])
-
-            print unicode(pfilters)
+            pfilters = list(filters)
+            pfilters.extend([(p, perm_set[p]) for p in ps])
+            aggregate = Aggregate(self.hierarchy.project, pfilters, drilldowns)
+            print aggregate.stats()
 
 
 class Hierarchy(object):

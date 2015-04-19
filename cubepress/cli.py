@@ -5,8 +5,6 @@ import yaml
 
 from cubepress.main import process_spec
 
-# engine, table, spec = load_file('/Users/fl/Code/flatolap/test_data/awards.csv')
-
 
 @click.command()
 @click.argument('spec', type=click.File('rb'))

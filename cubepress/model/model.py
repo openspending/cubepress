@@ -1,5 +1,7 @@
 import logging
 
+from sqlalchemy.sql.expression import func
+
 from cubepress.model.util import valid_name
 
 log = logging.getLogger(__name__)
@@ -43,8 +45,11 @@ class Attribute(object):
 class Measure(Attribute):
 
     def __init__(self, model, name, spec):
-        # spec['key'] = True
         super(Measure, self).__init__(model, name, spec)
+
+    @property
+    def aggregate_column(self):
+        return func.sum(self.column).label('%s_sum' % self.name)
 
 
 class Dimension(object):
