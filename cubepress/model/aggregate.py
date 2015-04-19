@@ -1,0 +1,4 @@
+
+
+class Aggregate(object):
+    pass

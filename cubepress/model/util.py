@@ -12,4 +12,5 @@ def valid_name(name):
 def resolve_column(model, path):
     parts = path.rsplit(':', 1)
     attribute = model.get_qualified(parts[0])
+    # TODO: allow extracting from date objects
     return attribute.column

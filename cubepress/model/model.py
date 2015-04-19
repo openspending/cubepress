@@ -61,7 +61,7 @@ class Dimension(object):
             yield Attribute(self.model, name, spec)
 
     def get_attribute(self, name):
-        for attribute in self.attribute:
+        for attribute in self.attributes:
             if attribute.name == name:
                 return attribute
 

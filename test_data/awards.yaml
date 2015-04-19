@@ -1,5 +1,8 @@
 config:
   data: awards.csv
+  database: sqlite:///foo.sqlite3
+  table: wb_awards
+
 model:
   measures:
     amount:
@@ -33,3 +36,14 @@ model:
           column: Supplier Country
         country_code:
           column: Supplier Country Code
+
+filters:
+  - path: borrower_country.code
+    value: 'KE'
+  - path: fiscal_year
+
+hierarchies:
+  supplier:
+    levels:
+      - supplier
+      - project
