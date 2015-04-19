@@ -30,7 +30,7 @@ def convert_bool(value):
 
 
 def convert_date(value):
-    return parse(unicode(value))
+    return parse(unicode(value)).date()
 
 
 TYPES = {

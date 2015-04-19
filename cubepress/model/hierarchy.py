@@ -1,17 +1,20 @@
+import logging
 from six import string_types
-
 
 from cubepress.model.filter import Filter
 from cubepress.model.aggregate import Aggregate
-from cubepress.model.util import valid_name, distinct_keys
+from cubepress.model.util import valid_name, distinct_keys, distinct_count
+
+log = logging.getLogger(__name__)
 
 
 class Level(object):
 
-    def __init__(self, hierarchy, parent, spec):
+    def __init__(self, hierarchy, parent, index, spec):
         self.hierarchy = hierarchy
         self.model = self.hierarchy.project.model
         self.parent = parent
+        self.index = index
         if isinstance(spec, string_types):
             spec = {'path': spec}
         self.spec = spec
@@ -37,15 +40,28 @@ class Level(object):
     def generate(self):
         drilldowns = [self.path]
         filters = self.query_filters()
+        log.info("Generating aggregates for hierarchy '%s', level %s",
+                 self.hierarchy.name, self.index)
         ps = self.query_permutations()
+
+        if not len(ps):
+            aggregate = Aggregate(self.hierarchy.project, filters, drilldowns)
+            yield aggregate
+            return
+
+        count = distinct_count(self.hierarchy.project,
+                               paths=ps, filters=filters)
+        if count > 10 ** 6:
+            log.error('Too many permutations (%s), aborting.', count)
+        else:
+            log.info('%s permutations on level %s', count, self.index)
+
         for perm_set in distinct_keys(self.hierarchy.project,
-                                      paths=ps,
-                                      filters=filters):
+                                      paths=ps, filters=filters):
             pfilters = list(filters)
             pfilters.extend([(p, perm_set[p]) for p in ps])
             aggregate = Aggregate(self.hierarchy.project, pfilters, drilldowns)
-            from pprint import pprint
-            pprint(aggregate.get())
+            yield aggregate
 
 
 class Hierarchy(object):
@@ -62,8 +78,8 @@ class Hierarchy(object):
         assert len(self.spec['levels']), msg
 
         parent = None
-        for spec in self.spec['levels']:
-            parent = Level(self, parent, spec)
+        for idx, spec in enumerate(self.spec['levels']):
+            parent = Level(self, parent, idx, spec)
             yield parent
 
     @property

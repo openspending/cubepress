@@ -1,5 +1,4 @@
 from normality import slugify
-
 from sqlalchemy import and_
 # from sqlalchemy.sql.expression import extract
 from sqlalchemy.sql.expression import select
@@ -36,13 +35,23 @@ def make_filters(project, filters):
     return filter
 
 
+def _distinct_query(project, paths, filters):
+    return select(columns=make_columns(project, paths),
+                  whereclause=make_filters(project, filters),
+                  from_obj=project.table, distinct=True)
+
+
+def distinct_count(project, paths=[], filters=[]):
+    query = _distinct_query(project, paths, filters)
+    rp = project.engine.execute(query.count())
+    return rp.fetchone().values()[0]
+
+
 def distinct_keys(project, paths=[], filters=[]):
-    query = select(columns=make_columns(project, paths),
-                   whereclause=make_filters(project, filters),
-                   from_obj=project.table, distinct=True)
+    query = _distinct_query(project, paths, filters)
     rp = project.engine.execute(query)
     while True:
         row = rp.fetchone()
         if row is None:
             return
-        yield row
+        yield dict(row.items())

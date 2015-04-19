@@ -28,9 +28,16 @@ class Project(object):
         self.model.match_fields(fields)
 
     @property
+    def dir(self):
+        return os.path.dirname(os.path.abspath(self.spec_file))
+
+    @property
     def data_file(self):
-        base_dir = os.path.dirname(os.path.abspath(self.spec_file))
-        return os.path.join(base_dir, self.config.get('data'))
+        return os.path.join(self.dir, self.config.get('data'))
+
+    @property
+    def path(self):
+        return os.path.join(self.dir, self.config.get('path'))
 
     @property
     def table_name(self):

@@ -2,6 +2,7 @@ config:
   data: awards.csv
   database: sqlite:///foo.sqlite3
   table: wb_awards
+  path: '../out.cube'
 
 model:
   measures:

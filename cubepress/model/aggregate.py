@@ -1,3 +1,4 @@
+import os
 from hashlib import sha1
 
 from sqlalchemy.sql.expression import select, func
@@ -39,7 +40,7 @@ class Aggregate(object):
             'filters': self.filters,
             'drilldowns': self.drilldowns,
             'key': self.key,
-            'hash': self.hash
+            # 'hash': self.hash
         }
         for measure in self.project.model.measures:
             name = measure.aggregate_column.name
@@ -71,3 +72,8 @@ class Aggregate(object):
     @property
     def hash(self):
         return sha1(self.key).hexdigest()
+
+    @property
+    def path(self):
+        hash = self.hash
+        return os.path.join('aggregates', hash[0], hash[1], '%s.json' % hash)
