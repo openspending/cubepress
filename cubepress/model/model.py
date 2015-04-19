@@ -17,6 +17,10 @@ class Attribute(object):
         return self.spec.get('column')
 
     @property
+    def key(self):
+        return self.spec.get('key', False)
+
+    @property
     def type(self):
         return self.spec.get('type')
 
@@ -35,7 +39,7 @@ class Attribute(object):
 class Measure(Attribute):
 
     def __init__(self, model, name, spec):
-        spec['key'] = True
+        # spec['key'] = True
         super(Measure, self).__init__(model, name, spec)
 
 
@@ -51,6 +55,23 @@ class Dimension(object):
     def attributes(self):
         for name, spec in self.spec.get('attributes', {}).items():
             yield Attribute(self.model, name, spec)
+
+    @property
+    def key(self):
+        key_attr, attrs = None, list(self.attributes)
+        for attribute in attrs:
+            if attribute.key:
+                if key_attr is not None:
+                    raise ValueError("Multiple key attributes in "
+                                     "dimension %s" % self.name)
+                key_attr = attribute
+        if key_attr is None:
+            if len(attrs) != 1:
+                raise ValueError("Could not determine key attribute "
+                                 "for dimension %s" % self.name)
+            key_attr = attrs[0]
+            key_attr.spec['key'] = True
+        return key_attr
 
 
 class Model(object):
@@ -104,3 +125,6 @@ class Model(object):
                         }
                     }
                 }
+
+        for dimension in self.dimensions:
+            assert dimension.key is not None, dimension

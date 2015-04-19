@@ -34,10 +34,10 @@ def generate_table(project, table_name, fields):
 
     seen = set()
     for attribute in project.model.attributes:
-        if attribute.column not in seen:
-            seen.add(attribute.column)
+        if attribute.column_name not in seen:
+            seen.add(attribute.column_name)
             type_cls = TYPES[attribute.type]
-            column = Column(attribute.column, type_cls, nullable=True)
+            column = Column(attribute.column_name, type_cls, nullable=True)
             table.append_column(column)
 
     table.create(project.engine)
@@ -50,7 +50,7 @@ def field_attributes(project, fields):
     mapping = {}
     for field in fields:
         for attr in project.model.attributes:
-            if attr.column == field['name']:
+            if attr.column_name == field['name']:
                 mapping[field['name']] = attr
     return mapping
 
