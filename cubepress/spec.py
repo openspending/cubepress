@@ -63,25 +63,16 @@ class Attribute(object):
     def type(self):
         return self.spec.get('type')
 
-    @property
-    def title(self):
-        return self.spec.get('title')
-
     def matches_field(self, field):
         keys = (field['name'], field['title'])
         if self.column:
             return self.column in keys
-        if self.name in keys:
-            return True
-        return self.title in keys
+        return self.name in keys
 
     def update_from_field(self, field):
-        if not self.column:
-            self.spec['column'] = field['name']
+        self.spec['column'] = field['name']
         if not self.type:
             self.spec['type'] = field['type']
-        if not self.title:
-            self.spec['title'] = field['title']
 
 
 class Measure(Attribute):
@@ -102,7 +93,7 @@ class Dimension(object):
     @property
     def attributes(self):
         for name, spec in self.spec.get('attributes', {}).items():
-            yield Attribute(self, name, spec)
+            yield Attribute(self.model, name, spec)
 
 
 class Model(object):
@@ -145,13 +136,10 @@ class Model(object):
             if not in_model and \
                     field['name'] not in self.spec['dimensions']:
                 self.spec['dimensions'][field['name']] = {
-                    'title': field['title'],
                     'attributes': {
-                        field['name']: {
+                        'label': {
                             'column': field['name'],
-                            'title': field['title'],
-                            'type': field['type'],
-                            'key': True
+                            'type': field['type']
                         }
                     }
                 }

@@ -1,8 +1,35 @@
 config:
-    data: awards.csv
+  data: awards.csv
 model:
-    measures:
-        amount:
-            title: 'Total Contract Amount (USD)'
-
-
+  measures:
+    amount:
+      column: 'Total Contract Amount (USD)'
+  dimensions:
+    borrower_country:
+      attributes:
+        label:
+          column: Borrower Country
+          key: true
+        code:
+          column: Borrower Country Code
+    fiscal_year:
+      attributes:
+        label:
+          column: Fiscal Year
+          type: date
+    project:
+      attributes:
+        id:
+          column: Project ID
+          key: true
+        name:
+          column: Project Name
+    supplier:
+      attributes:
+        label:
+          column: Supplier
+          key: true
+        country:
+          column: Supplier Country
+        country_code:
+          column: Supplier Country Code
