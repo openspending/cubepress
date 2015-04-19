@@ -4,6 +4,8 @@ import yaml
 from sqlalchemy import create_engine
 
 from cubepress.model.model import Model
+from cubepress.model.filter import Filter
+from cubepress.model.hierarchy import Hierarchy
 from cubepress.model.util import valid_name
 
 
@@ -39,6 +41,22 @@ class Project(object):
                 self.config['database'] = 'sqlite://'
             self._engine = create_engine(self.config.get('database'))
         return self._engine
+
+    @property
+    def table(self):
+        if not hasattr(self, '_table'):
+            self._table = create_engine(self.config.get('database'))
+        return self._table
+
+    @property
+    def filters(self):
+        for spec in self.spec.get('filters', []):
+            yield Filter(spec)
+
+    @property
+    def hierarchies(self):
+        for name, spec in self.spec.get('hierarchies', {}).items():
+            yield Hierarchy(self, name, spec)
 
     def __unicode__(self):
         return yaml.safe_dump(self.spec, indent=2, canonical=False,
