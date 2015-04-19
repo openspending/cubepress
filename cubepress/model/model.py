@@ -1,5 +1,7 @@
 import logging
 
+from cubepress.model.util import valid_name
+
 log = logging.getLogger(__name__)
 
 
@@ -7,11 +9,11 @@ class Attribute(object):
 
     def __init__(self, model, name, spec):
         self.model = model
-        self.name = name
+        self.name = valid_name(name)
         self.spec = spec
 
     @property
-    def column(self):
+    def column_name(self):
         return self.spec.get('column')
 
     @property
@@ -20,8 +22,8 @@ class Attribute(object):
 
     def matches_field(self, field):
         keys = (field['name'], field['title'])
-        if self.column:
-            return self.column in keys
+        if self.column_name:
+            return self.column_name in keys
         return self.name in keys
 
     def update_from_field(self, field):
@@ -41,7 +43,7 @@ class Dimension(object):
 
     def __init__(self, model, name, spec):
         self.model = model
-        self.name = name
+        self.name = valid_name(name)
         spec['attributes'] = spec.get('attributes', {})
         self.spec = spec
 

@@ -4,6 +4,7 @@ import yaml
 from sqlalchemy import create_engine
 
 from cubepress.model.model import Model
+from cubepress.model.util import valid_name
 
 
 class Project(object):
@@ -29,7 +30,7 @@ class Project(object):
 
     @property
     def table_name(self):
-        return self.config.get('table')
+        return valid_name(self.config.get('table'))
 
     @property
     def engine(self):
