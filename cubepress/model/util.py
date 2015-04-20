@@ -1,7 +1,7 @@
 # coding: utf-8
 from normality import slugify
 from sqlalchemy import and_
-# from sqlalchemy.sql.expression import extract
+from sqlalchemy.sql.expression import extract
 from sqlalchemy.sql.expression import select
 
 LABEL_SEP = u'‽'
@@ -21,13 +21,18 @@ def resolve_columns(model, path):
     for attribute in model.match_qualified(path):
         # TODO: allow extracting from date objects
         label = attribute.path.replace('.', LABEL_SEP)
-        yield attribute, attribute.column.label(label)
+        if part is not None:
+            label = '%s:%s' % (label, part)
+            column = extract(part, attribute.column)
+        else:
+            column = attribute.column
+        yield attribute, column.label(label)
 
 
 def resolve_column(model, path):
     columns = list(resolve_columns(model, path))
     for attr, column in columns:
-        if len(columns) == 1 or attr.key:
+        if len(columns) == 1 or attr and attr.key:
             return column
 
 
