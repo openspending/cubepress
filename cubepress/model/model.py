@@ -9,8 +9,9 @@ log = logging.getLogger(__name__)
 
 class Attribute(object):
 
-    def __init__(self, model, name, spec):
+    def __init__(self, model, parent, name, spec):
         self.model = model
+        self.parent = parent
         self.name = valid_name(name)
         self.spec = spec
 
@@ -25,6 +26,12 @@ class Attribute(object):
     @property
     def key(self):
         return self.spec.get('key', False)
+
+    @property
+    def path(self):
+        if self.parent is None:
+            return self.name
+        return '%s.%s' % (self.parent.name, self.name)
 
     @property
     def type(self):
@@ -45,7 +52,7 @@ class Attribute(object):
 class Measure(Attribute):
 
     def __init__(self, model, name, spec):
-        super(Measure, self).__init__(model, name, spec)
+        super(Measure, self).__init__(model, None, name, spec)
 
     @property
     def aggregate_column(self):
@@ -63,7 +70,7 @@ class Dimension(object):
     @property
     def attributes(self):
         for name, spec in self.spec.get('attributes', {}).items():
-            yield Attribute(self.model, name, spec)
+            yield Attribute(self.model, self, name, spec)
 
     def get_attribute(self, name):
         for attribute in self.attributes:
@@ -114,22 +121,15 @@ class Model(object):
             if dimension.name == name:
                 return dimension
 
-    def get_qualified(self, path):
-        dim_name, attribute = path, None
-        if '.' in dim_name:
-            dim_name, attribute = path.split('.', 1)
-
-        dimension = self.get_dimension(dim_name)
-        if dimension is None:
-            raise ValueError('Dimension does not exist: %s' % path)
-
-        if attribute is None or not len(attribute):
-            attribute = dimension.key
-        else:
-            attribute = dimension.get_attribute(attribute)
-            if attribute is None:
-                raise ValueError('Attribute does not exist: %s' % path)
-        return attribute
+    def match_qualified(self, path):
+        for attribute in self.attributes:
+            if attribute.path == path:
+                return [attribute]
+        if '.' not in path:
+            dimension = self.get_dimension(path)
+            if dimension is not None:
+                return dimension.attributes
+        raise ValueError('Attribute does not exist: %s' % path)
 
     @property
     def attributes(self):

@@ -1,7 +1,10 @@
+# coding: utf-8
 from normality import slugify
 from sqlalchemy import and_
 # from sqlalchemy.sql.expression import extract
 from sqlalchemy.sql.expression import select
+
+LABEL_SEP = u'‽'
 
 
 def valid_name(name):
@@ -11,19 +14,28 @@ def valid_name(name):
     return slug
 
 
+def resolve_columns(model, path):
+    part = None
+    if ':' in path:
+        path, part = path.rsplit(':', 1)
+    for attribute in model.match_qualified(path):
+        # TODO: allow extracting from date objects
+        label = attribute.path.replace('.', LABEL_SEP)
+        yield attribute, attribute.column.label(label)
+
+
 def resolve_column(model, path):
-    parts = path.rsplit(':', 1)
-    attribute = model.get_qualified(parts[0])
-    # TODO: allow extracting from date objects
-    return attribute.column
+    columns = list(resolve_columns(model, path))
+    for attr, column in columns:
+        if len(columns) == 1 or attr.key:
+            return column
 
 
 def make_columns(project, paths):
     cols = []
     for path in paths:
-        col = resolve_column(project.model, path)
-        col = col.label(path)
-        cols.append(col)
+        for attr, col in resolve_columns(project.model, path):
+            cols.append(col)
     return cols
 
 
@@ -33,6 +45,31 @@ def make_filters(project, filters):
         col = resolve_column(project.model, path)
         filter = and_(filter, col == value)
     return filter
+
+
+def unflatten_row(row, sep=LABEL_SEP):
+    out = {}
+    for f, v in row.items():
+        if sep not in f:
+            out[f] = v
+        else:
+            dim, attr = f.split(sep, 1)
+            if dim not in out:
+                out[dim] = {}
+            out[dim][attr] = v
+    return out
+
+
+def flatten_row(row, sep='.'):
+    out = {}
+    for k, v in row.items():
+        if isinstance(v, dict):
+            for ik, iv in v.items():
+                ik = '%s%s%s' % (k, sep, ik)
+                out[ik] = iv
+        else:
+            out[k] = v
+    return out
 
 
 def _distinct_query(project, paths, filters):
@@ -54,4 +91,4 @@ def distinct_keys(project, paths=[], filters=[]):
         row = rp.fetchone()
         if row is None:
             return
-        yield dict(row.items())
+        yield unflatten_row(row)

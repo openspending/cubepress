@@ -3,7 +3,7 @@ from hashlib import sha1
 
 from sqlalchemy.sql.expression import select, func
 
-from cubepress.model.util import make_columns, make_filters
+from cubepress.model.util import make_columns, make_filters, unflatten_row
 
 
 class Aggregate(object):
@@ -53,7 +53,7 @@ class Aggregate(object):
             row = rp.fetchone()
             if row is None:
                 return
-            yield dict(row.items())
+            yield unflatten_row(row)
 
     def get(self):
         return {
@@ -71,7 +71,7 @@ class Aggregate(object):
 
     @property
     def hash(self):
-        return sha1(self.key).hexdigest()
+        return sha1(self.key.encode('utf-8')).hexdigest()
 
     @property
     def path(self):

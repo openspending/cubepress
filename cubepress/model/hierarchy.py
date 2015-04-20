@@ -4,6 +4,7 @@ from six import string_types
 from cubepress.model.filter import Filter
 from cubepress.model.aggregate import Aggregate
 from cubepress.model.util import valid_name, distinct_keys, distinct_count
+from cubepress.model.util import flatten_row
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class Level(object):
         for perm_set in distinct_keys(self.hierarchy.project,
                                       paths=ps, filters=filters):
             pfilters = list(filters)
-            pfilters.extend([(p, perm_set[p]) for p in ps])
+            pfilters.extend(flatten_row(perm_set).items())
             aggregate = Aggregate(self.hierarchy.project, pfilters, drilldowns)
             yield aggregate
 

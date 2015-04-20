@@ -20,7 +20,10 @@ def process_spec(file_name, spec):
 
         for level in hierarchy.levels:
             for aggregate in level.generate():
-                write_json(project, aggregate.path, aggregate.get())
+                data = aggregate.get()
+                from pprint import pprint
+                pprint(data)
+                write_json(project, aggregate.path, data)
 
     cube = dict(project.spec)
     cube.pop('config', None)
