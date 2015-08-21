@@ -29,9 +29,8 @@ def generate_field_spec(row):
     names = set()
     fields = []
     for cell in row:
-        name = column_alias(cell, names)
         field = {
-            'name': name,
+            'name': column_alias(cell, names),
             'title': cell.column,
             'type': unicode(cell.type).lower()
         }

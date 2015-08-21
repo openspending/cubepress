@@ -1,5 +1,3 @@
-from cubepress.model.util import distinct_keys
-
 
 class Filter(object):
 
@@ -25,6 +23,6 @@ class Filter(object):
             return [self.value]
         if 'options' not in self.spec:
             # TODO: filters
-            options = distinct_keys(self.project, paths=[self.path])
-            self.spec['options'] = list(options)
+            options = self.project.cube.members(self.path)
+            self.spec['options'] = options.get('data')
         return self.spec['options']

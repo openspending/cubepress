@@ -1,5 +1,6 @@
 *.pyc
 dist/*
+pyenv/
 *.egg-info
 *.DS_Store
 *.sqlite3

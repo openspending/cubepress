@@ -2,7 +2,7 @@ import logging
 
 from sqlalchemy import MetaData
 from sqlalchemy.schema import Table, Column
-from sqlalchemy.types import Unicode, Integer, Date, Float, Boolean
+from sqlalchemy.types import Unicode, BigInteger, Integer, Date, Float, Boolean
 
 from cubepress.etl.extract import extract_file
 from cubepress.etl.convert import convert_row
@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 TYPES = {
     'string': Unicode,
-    'integer': Integer,
+    'integer': BigInteger,
     'bool': Boolean,
     'float': Float,
     'decimal': Float,  # look away
@@ -33,32 +33,36 @@ def generate_table(project, table_name, fields):
     table.append_column(id_col)
 
     seen = set()
-    for attribute in project.model.attributes:
-        if attribute.column_name not in seen:
-            seen.add(attribute.column_name)
-            type_cls = TYPES[attribute.type]
-            column = Column(attribute.column_name, type_cls, nullable=True)
-            table.append_column(column)
+    for concept in project.model.concepts:
+        if concept.column_name not in seen:
+            seen.add(concept.column_name)
+            for field in fields:
+                if field.get('name') != concept.column_name:
+                    continue
+                type_cls = TYPES[field.get('type')]
+                column = Column(concept.column_name, type_cls, nullable=True)
+                table.append_column(column)
 
     table.create(project.engine)
-    log.info("Generated ad-hoc table %s with %d columns.",
-             project.table_name, len(table.columns))
+    log.info("Generated ad-hoc table %s with %d columns: %r.",
+             project.table_name, len(table.columns),
+             [c.name for c in table.columns])
     project._table = table
     return table
 
 
-def field_attributes(project, fields):
-    mapping = {}
-    for field in fields:
-        for attr in project.model.attributes:
-            if attr.column_name == field['name']:
-                mapping[field['name']] = attr
-    return mapping
+# def field_attributes(project, fields):
+#     mapping = {}
+#     for field in fields:
+#         for attr in project.model.attributes:
+#             if attr.column_name == field['name']:
+#                 mapping[field['name']] = attr
+#     return mapping
 
 
 def load_project(project, chunk_size=500):
     table = None
-    attributes = {}
+    # attributes = {}
     chunk = []
     for i, record in enumerate(extract_file(project.data_file)):
         line = i + 1
@@ -67,9 +71,9 @@ def load_project(project, chunk_size=500):
             table = generate_table(project, table_name, fields)
             if table is False:
                 return
-            attributes = field_attributes(project, fields)
+            # attributes = field_attributes(project, fields)
 
-        chunk.append(convert_row(attributes, row, line))
+        chunk.append(convert_row(fields, row, line))
         if len(chunk) % chunk_size == 0:
             log.info("Loaded %s rows...", line)
             stmt = table.insert(chunk)

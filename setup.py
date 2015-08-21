@@ -31,6 +31,7 @@ setup(
         'click>=3.2',
         'normality>=0.1',
         'pyyaml>=3.11',
+        'babbage',
         'jtssql>=0.1',
         'datapackage>=0.5.2'
     ],

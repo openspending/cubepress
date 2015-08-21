@@ -2,9 +2,7 @@ import logging
 from six import string_types
 
 from cubepress.model.filter import Filter
-from cubepress.model.aggregate import Aggregate
-from cubepress.model.util import valid_name, distinct_keys, distinct_count
-from cubepress.model.util import flatten_row
+from cubepress.model.util import valid_name
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +29,8 @@ class Level(object):
         return self.parent.parent_paths + [self.parent.path]
 
     def query_filters(self):
-        return [(f.path, f.value) for f in self.hierarchy.filters if f.fixed]
+        return [(f.path, ':', f.value) for f in self.hierarchy.filters
+                if f.fixed]
 
     def query_permutations(self):
         ps = [f.path for f in self.hierarchy.filters if not f.fixed]
@@ -39,6 +38,7 @@ class Level(object):
         return list(set(ps))
 
     def generate(self):
+        cube = self.hierarchy.project.cube
         drilldowns = [self.path]
         filters = self.query_filters()
         log.info("Generating aggregates for hierarchy '%s', level %s",
@@ -46,23 +46,26 @@ class Level(object):
         ps = self.query_permutations()
 
         if not len(ps):
-            aggregate = Aggregate(self.hierarchy.project, filters, drilldowns)
-            yield aggregate
+            yield cube.aggregate(drilldowns=drilldowns, cuts=filters)
             return
 
-        count = distinct_count(self.hierarchy.project,
-                               paths=ps, filters=filters)
-        if count > 10 ** 6:
-            log.error('Too many permutations (%s), aborting.', count)
-        else:
-            log.info('%s permutations on level %s', count, self.index)
+        page = 0
+        while True:
+            members = cube.members(','.join(ps), cuts=filters, page=page)
+            if not len(members.get('data')):
+                return
+            count = members.get('total_member_count')
+            if count > 10 ** 6:
+                log.error('Too many permutations (%s), aborting.', count)
+            elif page == 0:
+                log.info('%s permutations on level %s', count, self.index)
+            page = page + 1
 
-        for perm_set in distinct_keys(self.hierarchy.project,
-                                      paths=ps, filters=filters):
-            pfilters = list(filters)
-            pfilters.extend(flatten_row(perm_set).items())
-            aggregate = Aggregate(self.hierarchy.project, pfilters, drilldowns)
-            yield aggregate
+            for member in members.get('data'):
+                pfilters = list(filters)
+                for name, value in member.items():
+                    pfilters.append((name, ':', value))
+                yield cube.aggregate(drilldowns=drilldowns, cuts=pfilters)
 
 
 class Hierarchy(object):

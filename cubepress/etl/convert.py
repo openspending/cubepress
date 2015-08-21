@@ -43,18 +43,20 @@ TYPES = {
 }
 
 
-def convert_row(attributes, row, line_no):
+def convert_row(fields, row, line_no):
     for column, value in row.items():
         if value is None:
             continue
-        attr = attributes.get(column)
-        cls, func = TYPES.get(attr.type)
-        if isinstance(value, cls):
-            continue
-        try:
-            row[column] = func(value)
-        except (ValueError, TypeError, AttributeError), e:
-            log.warning("Cannot load value '%s' row %s, type mismatch: %s",
-                        value, line_no, e)
-            row[column] = None
+        for field in fields:
+            if field.get('name') != column:
+                continue
+            cls, func = TYPES.get(field.get('type'))
+            if isinstance(value, cls):
+                continue
+            try:
+                row[column] = func(value)
+            except (ValueError, TypeError, AttributeError), e:
+                log.warning("Cannot load value '%s' row %s, type mismatch: %s",
+                            value, line_no, e)
+                row[column] = None
     return row
