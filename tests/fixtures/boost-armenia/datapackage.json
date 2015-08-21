@@ -1,0 +1,102 @@
+{
+  "name": "boost-armenia",
+  "title": "Armenia BOOST Government Expenditure Database",
+  "homepage": "http://wbi.worldbank.org/boost/country/armenia",
+  "version": "0.1.0",
+  "license": "PDDL-1.0",
+  "resources": [
+    {
+      "name": "armenia_boost_v1.7_expenditures_2006-2014_en-sample",
+      "path": "data/armenia_boost_v1.7_expenditures_2006-2014_en-sample.csv",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "bytes": 74326,
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "Year"
+          },
+          {
+            "name": "admin",
+            "type": "string",
+            "description": "Administrative Classification (Level 1) -- Agency"
+          },
+          {
+            "name": "econ1",
+            "type": "string",
+            "description": "Administrative Classification (Level 1) -- Agency"
+          },
+          {
+            "name": "econ2",
+            "type": "string",
+            "description": "Economic Classification (Level 2)"
+          },
+          {
+            "name": "econ3",
+            "type": "string",
+            "description": "Economic Classification (Level 3)"
+          },
+          {
+            "name": "econ4",
+            "type": "string",
+            "description": "Economic Classification (Level 4)"
+          },
+          {
+            "name": "func1",
+            "type": "string",
+            "description": "Functional Classification (Level 1) -- Division"
+          },
+          {
+            "name": "func2",
+            "type": "string",
+            "description": "Functional Classification (Level 2) -- Group"
+          },
+          {
+            "name": "func3",
+            "type": "string",
+            "description": "Functional Classification (Level 3) -- Class"
+          },
+          {
+            "name": "program",
+            "type": "number",
+            "description": "Program Classification -- Program"
+          },
+          {
+            "name": "exp_type",
+            "type": "string",
+            "description": "Expenditure Type Indicator"
+          },
+          {
+            "name": "Econ-func",
+            "type": "string",
+            "description": "Filter to account for subnational disaggregation"
+          },
+          {
+            "name": "transfer",
+            "type": "string",
+            "description": "Intrabudgetary Transfer Indicator"
+          },
+          {
+            "name": "approved",
+            "type": "integer",
+            "description": "Approved Budget (AMD)"
+          },
+          {
+            "name": "adjusted",
+            "type": "number",
+            "description": "Adjusted Budget (AMD)"
+          },
+          {
+            "name": "executed",
+            "type": "integer",
+            "description": "Executed Budget (AMD)"
+          }
+        ]
+      }
+    }
+ ],
+  "description": "",
+  "repository": "https://github.com/os-data/boost-armenia.git"
+}
