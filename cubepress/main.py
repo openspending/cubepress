@@ -1,7 +1,7 @@
 import logging
 
 from cubepress.model import Project
-from cubepress.etl import load_project
+from cubepress.loader import load_project
 from cubepress.output import write_json
 
 log = logging.getLogger(__name__)

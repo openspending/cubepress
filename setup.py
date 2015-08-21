@@ -26,12 +26,13 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[
-        'SQLAlchemy>=0.9.8',
-        'messytables>=0.2.1',
         'click>=3.2',
         'normality>=0.1',
         'pyyaml>=3.11',
         'babbage',
+        'jtskit',
+        'unicodecsv',
+        'typecast',
         'jtssql>=0.1',
         'datapackage>=0.5.2'
     ],
