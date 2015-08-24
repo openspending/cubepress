@@ -34,7 +34,7 @@ setup(
         'unicodecsv',
         'typecast',
         'jtssql>=0.1',
-        'datapackage>=0.5.2'
+        'datapackage>=0.5.3'
     ],
     tests_require=[],
     entry_points={

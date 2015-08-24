@@ -1,0 +1,5 @@
+[{
+  "sql": "SELECT department, SUM(amount) FROM 'data' WHERE year = 2013",
+  "file": "by-department",
+  "format": "csv"
+}]
