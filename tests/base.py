@@ -35,7 +35,7 @@ class TestMethods(unittest.TestCase):
     def test_make_sql(self):
         # not sure if this is necessary as jtssql loads data and makes sql
         package = DataPackage(pkgdir)
-        self.assertTrue(make_sql(True)
+        self.assertTrue(True)
 
     def test_compute_aggregates(self):
         # compute aggregates using datapackage.json and aggregates.json
