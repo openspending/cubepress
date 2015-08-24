@@ -32,7 +32,7 @@ setup(
         'normality>=0.1',
         'pyyaml>=3.11',
         'jtssql>=0.1',
-        'datapackage>=0.5.2'
+        'datapackage>=0.5.3'
     ],
     tests_require=[],
     entry_points={
