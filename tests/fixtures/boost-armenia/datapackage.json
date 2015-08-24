@@ -60,7 +60,7 @@
           },
           {
             "name": "program",
-            "type": "number",
+            "type": "string",
             "description": "Program Classification -- Program"
           },
           {
@@ -85,7 +85,7 @@
           },
           {
             "name": "adjusted",
-            "type": "number",
+            "type": "integer",
             "description": "Adjusted Budget (AMD)"
           },
           {
