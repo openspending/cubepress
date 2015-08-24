@@ -1,11 +1,12 @@
 import os
 import yaml
 
+from babbage.model import Model
+from babbage.cube import Cube
 from sqlalchemy import MetaData
 from sqlalchemy.schema import Table
 from sqlalchemy import create_engine
 
-from cubepress.model.model import Model
 from cubepress.model.filter import Filter
 from cubepress.model.hierarchy import Hierarchy
 from cubepress.model.util import valid_name
@@ -19,13 +20,24 @@ class Project(object):
     def __init__(self, spec_file, spec):
         self.spec_file = spec_file
         self.spec = spec
-        self.model = Model(self, spec.get('model', {}))
         self.config = spec.get('config', {})
 
     def update_from_data(self, table_name, fields):
         if self.table_name is None:
             self.config['table'] = table_name
-        self.model.match_fields(fields)
+        model = self.spec.get('model', {})
+        for measure in model.get('measures').values():
+            for field in fields:
+                if field['title'] == measure['column']:
+                    measure['column'] = field['name']
+        for dim in model.get('dimensions').values():
+            for attr in dim.get('attributes').values():
+                for field in fields:
+                    if field['title'] == attr['column']:
+                        attr['column'] = field['name']
+        # from pprint import pprint
+        # pprint(model)
+        self._cube = None
 
     @property
     def dir(self):
@@ -58,6 +70,19 @@ class Project(object):
             meta.bind = self.engine
             self._table = Table(self.table_name, meta, autoload=True)
         return self._table
+
+    @property
+    def model(self):
+        if not hasattr(self, '_model') or self._model is None:
+            self._model = Model(self.spec.get('model', {}))
+        return self._model
+
+    @property
+    def cube(self):
+        if not hasattr(self, '_cube') or self._cube is None:
+            self._cube = Cube(self.engine, 'cube', self.model,
+                              fact_table=self.table)
+        return self._cube
 
     @property
     def filters(self):
