@@ -1,5 +1,5 @@
 [{
-  "sql": "SELECT department, SUM(amount) FROM 'data' WHERE year = 2013",
+  "sql": "SELECT admin, SUM(executed) as amount FROM ':memory:' WHERE year = 2006 GROUP BY admin",
   "file": "by-department",
   "format": "csv"
 }]
