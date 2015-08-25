@@ -5,11 +5,16 @@ from jtssql import SchemaTable
 from sqlalchemy import create_engine
 from datapackage import DataPackage
 
+def UnicodeDictReader(utf8_data, **kwargs):
+    csv_reader = csv.DictReader(utf8_data, **kwargs)
+    for row in csv_reader:
+        yield {key: unicode(value, 'utf-8') for key, value in row.iteritems()}
+        
 def compute_aggregates(pkgdir,aggregates):
     dpo = DataPackage(pkgdir)
     schema = dpo.resources[0].schema
     csvpath = pkgdir + dpo.resources[0].path
-    data = [ row for row in csv.DictReader(open(csvpath)) ]
+    data = [ row for row in UnicodeDictReader(open(csvpath)) ]
     engine = create_engine('sqlite:///:memory:')
     table = SchemaTable(engine, ':memory:', schema)
     table.create()
