@@ -6,7 +6,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 import unittest
 from datapackage import DataPackage
-from utilities import compute_aggregates
+from cubepress.utils import compute_aggregates
 
 pkgdir = 'tests/fixtures/boost-armenia/'
 
@@ -15,8 +15,8 @@ class TestMethods(unittest.TestCase):
         # compute aggregates using datapackage.json and aggregates.json
         compute_aggregates(pkgdir, pkgdir + "aggregates.json")
 
-        # test aggregates CSV has been created
-        self.assertTrue(os.path.isfile(pkgdir + 'aggregates/by-department.csv'))
+        # test that at least one aggregate CSV has been created
+        self.assertTrue(os.path.isfile(pkgdir + 'aggregates/by-admin2-2006.csv'))
         
 if __name__ == '__main__':
     unittest.main()
