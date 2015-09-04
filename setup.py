@@ -35,7 +35,8 @@ setup(
         'typecast',
         'jtssql>=0.1',
         'datapackage>=0.5.3',
-        'babbage>=0.1.0'
+        'babbage>=0.1.0',
+        'nose'
     ],
     tests_require=[],
     entry_points={
