@@ -35,6 +35,10 @@ written in plain SQL:
 
 Cubepress can also generate aggregates from specially written report [YAML files](https://github.com/openspending/cubepress/blob/master/tests/fixtures/awards.yaml).
 
+## Testing
+
+    nosetests tests/base.py
+
 ## License
 
 ``cubepress`` is open source, licensed under a standard MIT license (included in this repository as ``LICENSE``).
