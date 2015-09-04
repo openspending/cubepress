@@ -1,0 +1,82 @@
+{
+  "name": "dataset-cra",
+  "title": "",
+  "homepage": "",
+  "version": "0.1.0",
+  "license": "PDDL-1.0",
+  "resources": [
+    {
+      "name": "cra",
+      "path": "data/cra.csv",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "bytes": 11523343,
+      "schema": {
+        "fields": [
+          {
+            "name": "recid",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "description": ""
+          },
+          {
+            "name": "amount",
+            "type": "number",
+            "description": ""
+          },
+          {
+            "name": "dept_code",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "cofog_level1_code",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "cofog_level2_code",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "cofog_level3_code",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "pog",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "id_or_non_id",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "cap_or_cur",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "cg_lg_or_pc",
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "nuts_region",
+            "type": "string",
+            "description": ""
+          }
+        ]
+      }
+    }
+  ],
+  "description": "",
+  "repository": "https://github.com/openspending/dataset-cra.git"
+}

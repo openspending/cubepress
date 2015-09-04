@@ -1,0 +1,12 @@
+[
+  {
+    "sql": "SELECT cofog_level1_code, dept_code, SUM(amount) as amount FROM 'table' WHERE year = 2010 GROUP BY cofog_level1_code, dept_code",
+    "file": "by-cofog1-then-department-2010",
+    "format": "csv"
+  },
+  {
+    "sql": "SELECT dept_code, SUM(amount) as amount FROM 'table' WHERE year = 2010 GROUP BY dept_code",
+    "file": "by-department-2010",
+    "format": "csv"
+  }
+]

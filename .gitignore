@@ -5,3 +5,5 @@ pyenv/
 *.DS_Store
 *.sqlite3
 *.cube
+tests/fixtures/dataset-cra/aggregates/*
+tests/fixtures/test.csv
