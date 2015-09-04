@@ -32,7 +32,6 @@ def save_res(filename,result,fileformat):
 def compute_aggregates(pkgdir,aggregates):
     engine = create_engine('sqlite:///:memory:')
     load_data(pkgdir,engine)
-    print(aggregates)
     agg_object = json.load(aggregates)
     agg_dir = pkgdir + 'aggregates'
     if not os.path.exists(agg_dir):
@@ -44,5 +43,4 @@ def compute_aggregates(pkgdir,aggregates):
 
 if __name__ == '__main__':
     pkgdir = sys.argv[1]
-    print(pkgdir)
     compute_aggregates(pkgdir, open(pkgdir + "aggregates.json"))
