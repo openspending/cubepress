@@ -1,3 +1,4 @@
+import sys
 import os
 import json
 import csv
@@ -5,30 +6,43 @@ from jtssql import SchemaTable
 from sqlalchemy import create_engine
 from datapackage import DataPackage
 
-def UnicodeDictReader(utf8_data, **kwargs):
-    csv_reader = csv.DictReader(utf8_data, **kwargs)
-    for row in csv_reader:
-        yield {key: unicode(value, 'utf-8') for key, value in row.iteritems()}
-        
-def compute_aggregates(pkgdir,aggregates):
+def load_data(pkgdir,engine):
     dpo = DataPackage(pkgdir)
     schema = dpo.resources[0].schema
     csvpath = pkgdir + dpo.resources[0].path
-    data = [ row for row in UnicodeDictReader(open(csvpath)) ]
-    engine = create_engine('sqlite:///:memory:')
-    table = SchemaTable(engine, ':memory:', schema)
+    data = [ row for row in csv.DictReader(open(csvpath)) ]
+    table = SchemaTable(engine, 'table', schema)
     table.create()
     table.load_iter(data)
-    sqla_table = table.table
-    aggregates_object = json.load(open(aggregates))
-    if not os.path.exists(pkgdir + 'aggregates'):
-        os.makedirs(pkgdir + 'aggregates')
-    for aggregate in aggregates_object:
-        fo = open(pkgdir + 'aggregates/%s.csv' % aggregate['file'], 'w')
-        query = aggregate['sql']
-        result = engine.execute(query)
+
+def run_aggregate(query,engine):
+    result = engine.execute(query)
+    return result
+
+def save_res(filename,result,fileformat):
+    fo = open(filename + "." + fileformat, 'w')
+    if fileformat == "csv":
         headers = result.keys()
         writer = csv.writer(fo)
         writer.writerows([headers])
         writer.writerows(result)
-        
+    elif fileformat == "json":
+        pass
+
+def compute_aggregates(pkgdir,aggregates):
+    engine = create_engine('sqlite:///:memory:')
+    load_data(pkgdir,engine)
+    print(aggregates)
+    agg_object = json.load(aggregates)
+    agg_dir = pkgdir + 'aggregates'
+    if not os.path.exists(agg_dir):
+        os.makedirs(agg_dir)
+    for aggregate in agg_object:
+        agg_file = agg_dir + '/' + aggregate['file']
+        res = run_aggregate(aggregate['sql'],engine)
+        save_res(agg_file,res,aggregate['format'])
+
+if __name__ == '__main__':
+    pkgdir = sys.argv[1]
+    print(pkgdir)
+    compute_aggregates(pkgdir, open(pkgdir + "aggregates.json"))
