@@ -1,7 +1,7 @@
 import os
 import logging
 import unicodecsv
-import jtskit
+import jsontableschema
 import typecast
 from normality import slugify
 from jtssql import SchemaTable
@@ -14,7 +14,7 @@ def get_schema(project):
     with open(project.data_file, 'r') as fh:
         headers = fh.readline().rstrip('\n').split(',')
         values = unicodecsv.reader(fh)
-        schema = jtskit.infer(headers, values, row_limit=500)
+        schema = jsontableschema.infer(headers, values, row_limit=500)
         for field in schema.get('fields'):
             field['title'] = field['name']
             field['name'] = slugify(field['name'], '_')
