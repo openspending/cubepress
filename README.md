@@ -22,18 +22,7 @@ $ pip install -e .
 
 ## Usage
 
-    cubepress -p <datapackage> <aggregates.json>
-
-where `aggregates.json` is specified as a JSON list of aggregates
-written in plain SQL:
-
-    [{
-      "sql": "SELECT admin, SUM(executed) as amount FROM 'table' WHERE year = 2006 GROUP BY admin",
-      "file": "by-department",
-      "format": "csv"
-    }]
-
-Cubepress can also generate aggregates from specially written report [YAML files](https://github.com/openspending/cubepress/blob/master/tests/fixtures/awards.yaml).
+    cubepress <datapackage.json>
 
 ## Testing
 
