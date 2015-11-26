@@ -1,7 +1,7 @@
 import logging
 
 import click
-import yaml
+import json
 
 from cubepress.main import process_spec
 from cubepress.utils import compute_aggregates
@@ -26,5 +26,5 @@ def cli(spec, datapackage, debug):
             logging.basicConfig(level=logging.INFO)
 
         spec_path = spec.name
-        spec = yaml.load(spec)
+        spec = json.load(spec)
         return process_spec(spec_path, spec)

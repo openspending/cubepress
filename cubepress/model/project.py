@@ -9,8 +9,7 @@ from sqlalchemy import create_engine
 
 from cubepress.model.filter import Filter
 from cubepress.model.hierarchy import Hierarchy
-from cubepress.model.util import valid_name
-
+from cubepress.model.util import valid_name, translate_fdp
 
 class Project(object):
     """ A project is the full specification of a given data
@@ -25,16 +24,16 @@ class Project(object):
     def update_from_data(self, table_name, fields):
         if self.table_name is None:
             self.config['table'] = table_name
-        model = self.spec.get('model', {})
-        for measure in model.get('measures').values():
+        model = self.spec.get('mapping', {})
+        for measure in model.get('measures'):
             for field in fields:
-                if field['title'] == measure['column']:
-                    measure['column'] = field['name']
-        for dim in model.get('dimensions').values():
-            for attr in dim.get('attributes').values():
+                if field['title'] == measure['source']:
+                    measure['source'] = field['name']
+        for dim in model.get('dimensions'):
+            for attr in dim.get('fields'):
                 for field in fields:
-                    if field['title'] == attr['column']:
-                        attr['column'] = field['name']
+                    if field['title'] == attr['source']:
+                        attr['source'] = field['name']
         # from pprint import pprint
         # pprint(model)
         self._cube = None
@@ -74,7 +73,7 @@ class Project(object):
     @property
     def model(self):
         if not hasattr(self, '_model') or self._model is None:
-            self._model = Model(self.spec.get('model', {}))
+            self._model = Model(translate_fdp(self.spec.get('mapping', {})))
         return self._model
 
     @property
